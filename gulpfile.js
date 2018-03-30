@@ -52,7 +52,7 @@ gulp.task('default', ['compile:all', 'watch:all', 'browserSync:serve']);
 // Watch src folder, when appropriate files are changed in src folder - call appropriate task:
 // Compile and move needed files to dist folder
 gulp.task('watch:all', ['browserSync:serve', 'compile:all'], function() {
-	gulp.watch(config.paths.html, {cwd: './'}, ['compile:html']).on('error', handleError); // Using cwd to update when files are
+	gulp.watch(config.paths.html, {cwd: './'}, ['compile:html']).on('error', handleError); // Using cwd hack to update browser when files are
 	gulp.watch(config.paths.img, {cwd: './'}, ['compile:img']).on('error', handleError); //     deleted and added
 	// gulp.watch(config.paths.css, ['compile:css']).on('error', handleError);
 	gulp.watch(config.paths.scss, {cwd: './'}, ['compile:sass']).on('error', handleError);
@@ -135,7 +135,7 @@ gulp.task('compile:less', function() {
 });
 
 // move css to dist folder
-gulp.task('compile:css', '', function() {
+gulp.task('compile:css', function() {
 	return gulp.src(config.paths.css)
 		.pipe(plumber({errorHandler: handleError}))
 		.pipe(gulp.dest('./dist/css'))
