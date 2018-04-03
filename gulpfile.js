@@ -53,9 +53,9 @@ gulp.task('default', ['compile:all', 'watch:all', 'browserSync:serve']);
 // Compile and move needed files to dist folder
 gulp.task('watch:all', ['browserSync:serve', 'compile:all'], function() {
 	gulp.watch(config.paths.html, {cwd: './'}, ['compile:html']).on('error', handleError); // Using cwd hack to update browser when files are
-	gulp.watch(config.paths.img, {cwd: './'}, ['compile:img']).on('error', handleError); //     deleted and added
-	// gulp.watch(config.paths.css, ['compile:css']).on('error', handleError);
+	gulp.watch(config.paths.img, {cwd: './'}, ['compile:img']).on('error', handleError); //     deleted and adde
 	gulp.watch(config.paths.scss, {cwd: './'}, ['compile:sass']).on('error', handleError);
+  gulp.watch(config.paths.css, {cwd: './'}, ['compile:css']).on('error', handleError);
 	gulp.watch(config.paths.js, {cwd: './'}, ['compile:js']).on('error', handleError);
 	
 	// Reload browser only when files in dist folder are changed
@@ -83,7 +83,7 @@ gulp.task('compile:img', function() {
 		.pipe(browserSync.stream());
 });
 
-// Compile sass to css, concat and move bundle.css to ./src/css and ./dist/css folders
+// Compile sass to css and move to ./src/css folders
 gulp.task('compile:sass', function() {
 	
 	// Dynamically add plugins depending on if developing or publishing
@@ -95,7 +95,7 @@ gulp.task('compile:sass', function() {
 			//cssnano({autoprefixer: false})
 		];
 		
-		// add uncss plugin if publishing
+		// add plugins if publishing
 		if (!config.isDevelop) {
 			_plugins.splice(_plugins.length - 1, 0, uncss({html: ['src/index.html']}));
 			_plugins.splice(_plugins.length - 1, 0, cssnano({autoprefixer: false}));
@@ -108,11 +108,9 @@ gulp.task('compile:sass', function() {
 		.pipe(gulpIf(config.isDevelop, sourcemaps.init())) // init sourcemaps if developing
 		.pipe(plumber({errorHandler: handleError})) // add plumber to catch errors
 		.pipe(sass()) // compile
-		.pipe(concat('bundle.min.css')) // concat all files together
 		.pipe(postcss(plugins)) // pass through postcss
 		.pipe(gulpIf(config.isDevelop, sourcemaps.write())) // write sourcemaps if developing
 		.pipe(gulp.dest('./src/css'))
-		.pipe(gulp.dest('./dist/css'))
 		.pipe(browserSync.stream()); // Stream it to update page in real time without reloading page
 });
 
@@ -137,9 +135,10 @@ gulp.task('compile:less', function() {
 // move css to dist folder
 gulp.task('compile:css', function() {
 	return gulp.src(config.paths.css)
-		.pipe(plumber({errorHandler: handleError}))
-		.pipe(gulp.dest('./dist/css'))
-		.pipe(browserSync.stream());
+			.pipe(plumber({errorHandler: handleError}))
+			.pipe(concat('bundle.min.css'))
+			.pipe(gulp.dest('./dist/css'))
+			.pipe(browserSync.stream());
 });
 
 gulp.task('compile:js', function() {
